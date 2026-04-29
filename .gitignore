@@ -1,0 +1,55 @@
+# Python bytecode / caches
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.cache/
+
+# Virtual environments
+car_env/
+.venv/
+venv/
+ENV/
+env/
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+rl_logs/
+logs/
+
+# Data, generated artifacts, and large outputs (keep the repo code-only)
+data_clean/
+data_idm_auto/
+checkpoints_v2/
+rl_checkpoints/
+gradcam_outputs/
+report/
+
+# Model / binary artifacts
+*.pth
+*.pt
+*.onnx
+*.zip
+*.pkl
+*.joblib
+
+# Numpy / dataset artifacts
+*.npy
+*.npz
+
+# Local generated images (optional; keep README clean)
+eda_report.png
