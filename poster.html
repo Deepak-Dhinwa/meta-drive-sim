@@ -5,20 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sensor Fusion Driving</title>
 <style>
-:root { --ink:#1c1915; --muted:#5c564c; --line:#d9d1c3; --paper:#f6f1e7; --card:#fffdf8; --accent:#1F3D36; }
+
+:root { --ink:#1c1915; --muted:#5c564c; --line:#d9d1c3; --paper:#f6f1e7; --card:#fffdf8; --accent:#1E3A5F; }
 * { box-sizing:border-box; }
 body { margin:0; background:#e7e1d6; color:var(--ink); font-family:Georgia, "Iowan Old Style", serif; }
 .sheet { max-width:1180px; margin:28px auto; background:var(--paper); border:1px solid var(--line); }
-.band { display:grid; grid-template-columns:1.25fr 1fr 0.9fr; border-top:1px solid var(--line); }
-.band section { padding-bottom:18px; }
-header { display:flex; justify-content:space-between; gap:24px; padding:28px 32px 18px; border-bottom:3px solid var(--accent); }
+header { display:flex; justify-content:space-between; gap:24px; padding:26px 32px 16px; border-bottom:3px solid var(--accent); }
 h1 { font-size:34px; line-height:1.05; margin:0 0 8px; letter-spacing:-0.4px; }
-.claim { margin:0; font-family:"Segoe UI", sans-serif; font-size:16px; color:var(--muted); max-width:680px; }
+.claim { margin:0; font-family:"Segoe UI", sans-serif; font-size:16px; color:var(--muted); max-width:720px; }
 .kicker { font-family:"Segoe UI", sans-serif; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); margin:0 0 8px; }
 .tags { font-family:"Segoe UI", sans-serif; font-size:12px; text-align:right; color:var(--muted); }
 .tags span { display:inline-block; border:1px solid var(--line); padding:4px 8px; margin:0 0 6px 6px; background:var(--card); }
-.grid { display:grid; grid-template-columns:1.1fr 1fr 0.9fr; }
-section { padding:22px 24px 8px; border-right:1px solid var(--line); }
+.path { display:grid; grid-template-columns:repeat(4,1fr); list-style:none; margin:0; padding:0; border-bottom:1px solid var(--line); }
+.path li { padding:12px 16px 14px; border-right:1px solid var(--line); }
+.path li:last-child { border-right:0; }
+.path b { display:block; font-family:"Segoe UI", sans-serif; font-size:11px; letter-spacing:0.12em; color:var(--accent); margin-bottom:4px; }
+.path span { font-family:"Segoe UI", sans-serif; font-size:13.5px; line-height:1.35; }
+.grid, .band { display:grid; grid-template-columns:1.15fr 1fr 0.9fr; }
+.band { border-top:1px solid var(--line); }
+section { padding:18px 22px 8px; border-right:1px solid var(--line); }
 section:last-child { border-right:0; }
 h2 { font-family:"Segoe UI", sans-serif; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; margin:0 0 10px; color:var(--accent); }
 p, li { font-family:"Segoe UI", sans-serif; font-size:14.5px; line-height:1.45; }
@@ -26,35 +31,83 @@ ul { margin:0; padding-left:18px; }
 .stat { border-top:1px solid var(--line); padding:10px 0; }
 .stat b { display:block; font-size:26px; font-family:Georgia, serif; }
 .stat span { font-family:"Segoe UI", sans-serif; font-size:12px; color:var(--muted); }
-footer { display:flex; justify-content:space-between; gap:20px; padding:16px 32px 22px; border-top:1px solid var(--line); font-family:"Segoe UI", sans-serif; font-size:14px; }
+.out { font-family:Consolas, monospace; font-size:12.5px; line-height:1.55; background:var(--card); border:1px solid var(--line); padding:10px 12px; margin:0 0 8px; white-space:pre-wrap; }
+.shots { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; padding:8px 22px 18px; border-top:1px solid var(--line); }
+.shots.one { grid-template-columns:1fr; }
+.shots.two { grid-template-columns:1.15fr 1fr; }
+.shots figure { margin:0; background:var(--card); border:1px solid var(--line); }
+.shots img { width:100%; height:190px; object-fit:contain; background:#fff; display:block; }
+.shots.one img { height:280px; }
+.shots figcaption { font-family:"Segoe UI", sans-serif; font-size:12px; color:var(--muted); padding:6px 8px 8px; }
+.next { margin:0; padding:12px 28px 16px; border-top:1px solid var(--line); font-family:"Segoe UI", sans-serif; font-size:13.5px; color:var(--muted); line-height:1.45; }
+.next b { color:var(--ink); font-weight:600; }
+footer { display:flex; justify-content:space-between; gap:20px; padding:16px 28px 22px; border-top:1px solid var(--line); font-family:"Segoe UI", sans-serif; font-size:14px; }
 code { font-family:Consolas, monospace; background:var(--card); border:1px solid var(--line); padding:2px 6px; }
-@media (max-width:800px) { .grid, .band { grid-template-columns:1fr; } section { border-right:0; border-bottom:1px solid var(--line); } header, footer { display:block; } .tags { text-align:left; margin-top:12px; } }
+@media (max-width:800px) {
+  .grid, .band, .path, .shots, .shots.two { grid-template-columns:1fr; }
+  section { border-right:0; border-bottom:1px solid var(--line); }
+  header, footer { display:block; }
+  .tags { text-align:left; margin-top:12px; }
+}
+
 </style>
 </head>
 <body>
 <article class="sheet">
+
   <header>
     <div>
       <p class="kicker">Built model</p>
       <h1>Sensor Fusion Driving</h1>
-      <p class="claim">A camera and a 19-number state vector learn to steer from an expert. Reinforcement learning then keeps the car on the road much longer, and still never reaches the destination.</p>
+      <p class="claim">A camera and a 19-number state learn to copy an expert. Reinforcement learning then keeps the car up much longer. Finishing the route is the open goal.</p>
     </div>
     <div class="tags"><span>EfficientNet-B0</span><span>PPO</span><span>MetaDrive</span></div>
   </header>
+  <ol class="path">
+    <li><b>01 · Watch an expert</b><span>IDM demonstrations: a 128×128 frame plus 19 state numbers, and the action that was taken.</span></li>
+    <li><b>02 · Copy it</b><span>EfficientNet on the image, a small MLP on the state, fused into steering and acceleration.</span></li>
+    <li><b>03 · See the miss</b><span>Grad-CAM on the turns the imitator gets wrong. Moderate steering is the band the loss under-weights.</span></li>
+    <li><b>04 · Drive longer</b><span>PPO warm-started from the sensor branch, so it does not begin from a random policy.</span></li>
+  </ol>
   <div class="grid">
-    <section><h2>Question</h2><ul><li>Why does a low imitation loss still drive off the road, and what does fine-tuning change?</li></ul></section>
-    <section><h2>Method</h2><ul><li>EfficientNet-B0 on a 128×128 frame, an MLP on 19 state values, fused to steering and acceleration.</li><li>Behavioral cloning on IDM demonstrations, then PPO warm-started from the sensor branch.</li><li>Grad-CAM on the turns the imitator misses.</li></ul></section>
-    <section><h2>Evidence</h2><div class="stat"><b>0.00043</b><span>best validation MSE</span></div><div class="stat"><b>+655%</b><span>survival vs the imitator, at 480k steps</span></div><div class="stat"><b>0%</b><span>success at a destination</span></div></section>
+    <section><h2>Question</h2><ul>
+      <li>Why does a tiny imitation loss still leave the road, and what does a second phase of learning change?</li>
+    </ul></section>
+    <section><h2>Why this path</h2><ul>
+      <li>Camera-only was the baseline. Adding the 19 state values is what dropped the error.</li>
+      <li>Imitation learns the average action. The rare moderate turn is where the car leaves the lane, so a second phase has to practice driving, not just copying.</li>
+    </ul></section>
+    <section><h2>What held</h2>
+      <div class="stat"><b>0.00043</b><span>best validation MSE, epoch 20</span></div>
+      <div class="stat"><b>~7.5×</b><span>longer episodes after PPO, vs the imitator</span></div>
+      <div class="stat"><b>19 + image</b><span>state vector fused with the camera</span></div>
+    </section>
   </div>
   <div class="band">
-    <section><h2>What the result actually says</h2><ul><li>Best imitation loss is 0.00043 MSE at epoch 20. The network is 4.89 million parameters, 882 thousand of them trainable while the backbone is frozen.</li><li>On 20 unseen episodes the imitator arrives nowhere: 19 run off the road, 1 crashes, average 299 steps and about 98 meters. Grad-CAM shows moderate turns attending to sky and terrain.</li><li>PPO warm-started from the sensor branch. At step 480,000 the average episode is 2,256 steps, about 7.5 times the imitator. Destination success stays 0%.</li></ul></section>
-    <section><h2>What it does not show</h2><ul><li>The +655% figure is survival time, not trips completed. The +3000 destination bonus is never collected in 500,000 steps.</li><li>Crash rate is 0% at the end, after a 5–10% spike around steps 280,000–310,000. Out-of-road is still about 90% at the long-survival checkpoint.</li><li>Checkpoints, the driving logs, and both datasets stay on this machine. GitHub has the code and the poster.</li></ul></section>
-    <section><h2>Beside the other attempts</h2><ul><li>Camera-only validation loss in the published comparison is 0.05322. The fusion number used for the stated 81.5% gain was 0.00985. The saved fusion checkpoint later reached 0.00043.</li><li>Extreme turns are predicted closely. The failure is the moderate steering band, about 0.1 to 0.4, which the loss under-weights.</li></ul></section>
+    <section><h2>Reading the result</h2><ul>
+      <li>The network is 4.89 million parameters. 882 thousand train while the backbone is frozen, then the backbone is unfrozen and the loss keeps falling.</li>
+      <li>The imitator, on 20 unseen episodes, runs off the road. Average life is about 300 steps and about 98 meters. Extreme turns are predicted closely. The miss is the gentle bend.</li>
+      <li>After PPO the average episode is much longer, on the order of a couple of thousand steps. The car survives. Reaching the destination is the target the reward has not collected yet.</li>
+    </ul></section>
+    <section><h2>Why the loss and the road disagree</h2><ul>
+      <li>Most training frames are easy: straight, or a sharp turn the expert takes often. A small error there dominates the average.</li>
+      <li>Grad-CAM on the missed turns looks at sky and terrain. The fusion was built so the state vector can cover what the image attends to poorly.</li>
+    </ul></section>
+    <section><h2>The comparison that mattered</h2><ul>
+      <li>Camera-only validation loss in the published check is about 0.053. Fusion is far below that. The saved checkpoint reached 0.00043.</li>
+      <li>Charts below: the imitation curve, then the PPO phase.</li>
+    </ul></section>
   </div>
+  <div class="shots two">
+    <figure><img src="report/chart_training.png" alt="Imitation training curve"><figcaption>Train and validation loss. The best validation point is epoch 20.</figcaption></figure>
+    <figure><img src="report/rl_analysis.png" alt="PPO fine-tuning charts"><figcaption>The second phase. Episodes get longer. Route completion is the part still ahead.</figcaption></figure>
+  </div>
+  <p class="next"><b>Next pass.</b> Survival improved by a wide margin. Arriving at the destination did not, in this 500,000-step run. That is the training target still open, and the checkpoints stay on this machine.</p>
   <footer>
-    <div><h2>Stack</h2><p>EfficientNet-B0, a 19-d sensor MLP, MetaDrive, Stable-Baselines3 PPO. The dashboard environment is car_env. The checkpoint is checkpoints_v2/best_model.pth.</p></div>
-    <div><h2>Look at it</h2><p>Run <code>.\run.ps1</code> for the dashboard. <code>inference.py</code> only benchmarks the checkpoint.</p></div>
+    <div><h2>Stack</h2><p>EfficientNet-B0, a 19-d sensor MLP, MetaDrive, Stable-Baselines3 PPO. Dashboard environment is <code>car_env</code>. Checkpoint is <code>checkpoints_v2/best_model.pth</code>.</p></div>
+    <div><h2>Look at it</h2><p>Run <code>.\run.ps1</code> for the dashboard. <code>inference.py</code> benchmarks the checkpoint.</p></div>
   </footer>
+
 </article>
 </body>
 </html>
