@@ -8,7 +8,9 @@
 :root { --ink:#1c1915; --muted:#5c564c; --line:#d9d1c3; --paper:#f6f1e7; --card:#fffdf8; --accent:#1F3D36; }
 * { box-sizing:border-box; }
 body { margin:0; background:#e7e1d6; color:var(--ink); font-family:Georgia, "Iowan Old Style", serif; }
-.sheet { max-width:1100px; margin:28px auto; background:var(--paper); border:1px solid var(--line); }
+.sheet { max-width:1180px; margin:28px auto; background:var(--paper); border:1px solid var(--line); }
+.band { display:grid; grid-template-columns:1.25fr 1fr 0.9fr; border-top:1px solid var(--line); }
+.band section { padding-bottom:18px; }
 header { display:flex; justify-content:space-between; gap:24px; padding:28px 32px 18px; border-bottom:3px solid var(--accent); }
 h1 { font-size:34px; line-height:1.05; margin:0 0 8px; letter-spacing:-0.4px; }
 .claim { margin:0; font-family:"Segoe UI", sans-serif; font-size:16px; color:var(--muted); max-width:680px; }
@@ -26,7 +28,7 @@ ul { margin:0; padding-left:18px; }
 .stat span { font-family:"Segoe UI", sans-serif; font-size:12px; color:var(--muted); }
 footer { display:flex; justify-content:space-between; gap:20px; padding:16px 32px 22px; border-top:1px solid var(--line); font-family:"Segoe UI", sans-serif; font-size:14px; }
 code { font-family:Consolas, monospace; background:var(--card); border:1px solid var(--line); padding:2px 6px; }
-@media (max-width:800px) { .grid { grid-template-columns:1fr; } section { border-right:0; border-bottom:1px solid var(--line); } header, footer { display:block; } .tags { text-align:left; margin-top:12px; } }
+@media (max-width:800px) { .grid, .band { grid-template-columns:1fr; } section { border-right:0; border-bottom:1px solid var(--line); } header, footer { display:block; } .tags { text-align:left; margin-top:12px; } }
 </style>
 </head>
 <body>
@@ -44,8 +46,13 @@ code { font-family:Consolas, monospace; background:var(--card); border:1px solid
     <section><h2>Method</h2><ul><li>EfficientNet-B0 on a 128×128 frame, an MLP on 19 state values, fused to steering and acceleration.</li><li>Behavioral cloning on IDM demonstrations, then PPO warm-started from the sensor branch.</li><li>Grad-CAM on the turns the imitator misses.</li></ul></section>
     <section><h2>Evidence</h2><div class="stat"><b>0.00043</b><span>best validation MSE</span></div><div class="stat"><b>+655%</b><span>survival vs the imitator, at 480k steps</span></div><div class="stat"><b>0%</b><span>success at a destination</span></div></section>
   </div>
+  <div class="band">
+    <section><h2>What the result actually says</h2><ul><li>Best imitation loss is 0.00043 MSE at epoch 20. The network is 4.89 million parameters, 882 thousand of them trainable while the backbone is frozen.</li><li>On 20 unseen episodes the imitator arrives nowhere: 19 run off the road, 1 crashes, average 299 steps and about 98 meters. Grad-CAM shows moderate turns attending to sky and terrain.</li><li>PPO warm-started from the sensor branch. At step 480,000 the average episode is 2,256 steps, about 7.5 times the imitator. Destination success stays 0%.</li></ul></section>
+    <section><h2>What it does not show</h2><ul><li>The +655% figure is survival time, not trips completed. The +3000 destination bonus is never collected in 500,000 steps.</li><li>Crash rate is 0% at the end, after a 5–10% spike around steps 280,000–310,000. Out-of-road is still about 90% at the long-survival checkpoint.</li><li>Checkpoints, the driving logs, and both datasets stay on this machine. GitHub has the code and the poster.</li></ul></section>
+    <section><h2>Beside the other attempts</h2><ul><li>Camera-only validation loss in the published comparison is 0.05322. The fusion number used for the stated 81.5% gain was 0.00985. The saved fusion checkpoint later reached 0.00043.</li><li>Extreme turns are predicted closely. The failure is the moderate steering band, about 0.1 to 0.4, which the loss under-weights.</li></ul></section>
+  </div>
   <footer>
-    <div><h2>What came out of it</h2><ul><li>Moderate turns are underestimated. Attention drifts to sky and terrain.</li><li>At step 480k the average episode is 2,256 steps against 299 for the imitator. The goal reward is never collected.</li></ul></div>
+    <div><h2>Stack</h2><p>EfficientNet-B0, a 19-d sensor MLP, MetaDrive, Stable-Baselines3 PPO. The dashboard environment is car_env. The checkpoint is checkpoints_v2/best_model.pth.</p></div>
     <div><h2>Look at it</h2><p>Run <code>.\run.ps1</code> for the dashboard. <code>inference.py</code> only benchmarks the checkpoint.</p></div>
   </footer>
 </article>
