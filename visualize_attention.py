@@ -3,6 +3,8 @@ import numpy as np
 import cv2
 import os
 import sys
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -173,5 +175,5 @@ if __name__ == "__main__":
 
     plt.tight_layout()
     plt.savefig(os.path.join(OUT_DIR, "gradcam_grid.png"), dpi=120)
-    plt.show()
+    plt.close()
     print(f"Saved to {OUT_DIR}/gradcam_grid.png")

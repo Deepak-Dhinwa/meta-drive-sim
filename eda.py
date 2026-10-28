@@ -1,5 +1,7 @@
 import numpy as np
 import pandas as pd
+import matplotlib
+matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
 from glob import glob
@@ -174,6 +176,6 @@ axes[2,2].set_title("Steering vs Acceleration"); axes[2,2].set_xlabel("steering"
 axes[2,2].set_ylabel("acceleration")
 
 plt.tight_layout()
-plt.savefig("eda_clean_report.png", dpi=120)
-plt.show()
-print("\nEDA complete. Saved: eda_clean_report.png")
+plt.savefig("eda_report.png", dpi=120)
+plt.close()
+print("\nEDA complete. Saved: eda_report.png")

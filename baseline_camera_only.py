@@ -14,11 +14,13 @@ if __name__ == '__main__':
     PATIENCE       = 12
     DEVICE         = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    with open("data/split.json") as f:
+    os.makedirs(CHECKPOINT_DIR, exist_ok=True)
+
+    with open("data_clean/split.json") as f:
         split = json.load(f)
 
     train_loader, val_loader = get_dataloaders(
-        proc_dir   = "data/processed",
+        proc_dir   = "data_clean/processed",
         train_eps  = split["train"],
         val_eps    = split["val"],
         batch_size = BATCH_SIZE,
@@ -90,6 +92,17 @@ if __name__ == '__main__':
     with open(os.path.join(CHECKPOINT_DIR, "camera_only_history.json"), "w") as f:
         json.dump(history, f)
 
+    # 0.00985 is the fusion loss from the run that produced the published
+    # 81.5% figure. The saved checkpoints_v2 model later reached 0.00043.
+    published_fusion = 0.00985
+    current_fusion = None
+    ckpt_path = "checkpoints_v2/best_model.pth"
+    if os.path.exists(ckpt_path):
+        current_fusion = torch.load(ckpt_path, map_location="cpu", weights_only=True)["val_loss"]
+
     print(f"\nCamera-only best val loss: {best_val_loss:.5f}")
-    print(f"Fusion model best val loss: 0.00985")
-    print(f"Sensor fusion improvement:  {(best_val_loss - 0.00985)/best_val_loss*100:.1f}%")
+    print(f"Fusion loss in the published comparison: {published_fusion:.5f}")
+    print(f"Sensor fusion improvement vs that run: "
+          f"{(best_val_loss - published_fusion)/best_val_loss*100:.1f}%")
+    if current_fusion is not None:
+        print(f"Current checkpoints_v2 val loss: {current_fusion:.5f}")

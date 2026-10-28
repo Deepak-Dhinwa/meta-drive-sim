@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sensor Fusion Driving</title>
+<style>
+:root { --ink:#1c1915; --muted:#5c564c; --line:#d9d1c3; --paper:#f6f1e7; --card:#fffdf8; --accent:#1F3D36; }
+* { box-sizing:border-box; }
+body { margin:0; background:#e7e1d6; color:var(--ink); font-family:Georgia, "Iowan Old Style", serif; }
+.sheet { max-width:1100px; margin:28px auto; background:var(--paper); border:1px solid var(--line); }
+header { display:flex; justify-content:space-between; gap:24px; padding:28px 32px 18px; border-bottom:3px solid var(--accent); }
+h1 { font-size:34px; line-height:1.05; margin:0 0 8px; letter-spacing:-0.4px; }
+.claim { margin:0; font-family:"Segoe UI", sans-serif; font-size:16px; color:var(--muted); max-width:680px; }
+.kicker { font-family:"Segoe UI", sans-serif; font-size:12px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); margin:0 0 8px; }
+.tags { font-family:"Segoe UI", sans-serif; font-size:12px; text-align:right; color:var(--muted); }
+.tags span { display:inline-block; border:1px solid var(--line); padding:4px 8px; margin:0 0 6px 6px; background:var(--card); }
+.grid { display:grid; grid-template-columns:1.1fr 1fr 0.9fr; }
+section { padding:22px 24px 8px; border-right:1px solid var(--line); }
+section:last-child { border-right:0; }
+h2 { font-family:"Segoe UI", sans-serif; font-size:12px; letter-spacing:0.16em; text-transform:uppercase; margin:0 0 10px; color:var(--accent); }
+p, li { font-family:"Segoe UI", sans-serif; font-size:14.5px; line-height:1.45; }
+ul { margin:0; padding-left:18px; }
+.stat { border-top:1px solid var(--line); padding:10px 0; }
+.stat b { display:block; font-size:26px; font-family:Georgia, serif; }
+.stat span { font-family:"Segoe UI", sans-serif; font-size:12px; color:var(--muted); }
+footer { display:flex; justify-content:space-between; gap:20px; padding:16px 32px 22px; border-top:1px solid var(--line); font-family:"Segoe UI", sans-serif; font-size:14px; }
+code { font-family:Consolas, monospace; background:var(--card); border:1px solid var(--line); padding:2px 6px; }
+@media (max-width:800px) { .grid { grid-template-columns:1fr; } section { border-right:0; border-bottom:1px solid var(--line); } header, footer { display:block; } .tags { text-align:left; margin-top:12px; } }
+</style>
+</head>
+<body>
+<article class="sheet">
+  <header>
+    <div>
+      <p class="kicker">Built model</p>
+      <h1>Sensor Fusion Driving</h1>
+      <p class="claim">A camera and a 19-number state vector learn to steer from an expert. Reinforcement learning then keeps the car on the road much longer, and still never reaches the destination.</p>
+    </div>
+    <div class="tags"><span>EfficientNet-B0</span><span>PPO</span><span>MetaDrive</span></div>
+  </header>
+  <div class="grid">
+    <section><h2>Question</h2><ul><li>Why does a low imitation loss still drive off the road, and what does fine-tuning change?</li></ul></section>
+    <section><h2>Method</h2><ul><li>EfficientNet-B0 on a 128×128 frame, an MLP on 19 state values, fused to steering and acceleration.</li><li>Behavioral cloning on IDM demonstrations, then PPO warm-started from the sensor branch.</li><li>Grad-CAM on the turns the imitator misses.</li></ul></section>
+    <section><h2>Evidence</h2><div class="stat"><b>0.00043</b><span>best validation MSE</span></div><div class="stat"><b>+655%</b><span>survival vs the imitator, at 480k steps</span></div><div class="stat"><b>0%</b><span>success at a destination</span></div></section>
+  </div>
+  <footer>
+    <div><h2>What came out of it</h2><ul><li>Moderate turns are underestimated. Attention drifts to sky and terrain.</li><li>At step 480k the average episode is 2,256 steps against 299 for the imitator. The goal reward is never collected.</li></ul></div>
+    <div><h2>Look at it</h2><p>Run <code>.\run.ps1</code> for the dashboard. <code>inference.py</code> only benchmarks the checkpoint.</p></div>
+  </footer>
+</article>
+</body>
+</html>
